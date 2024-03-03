@@ -15,7 +15,13 @@ class _WebViewScreenState extends State<WebViewScreen> {
   var intialUrl = "https://www.google.com/";
   double progress =0;
   var urlController = TextEditingController();
-  
+   void loadUrl(String url) async {
+    if (webViewController != null) {
+      await webViewController!.loadUrl(
+        urlRequest: URLRequest(url: WebUri(url)),
+      );
+    }
+  }
   @override
   Widget build(BuildContext context) {
    return Scaffold(
@@ -23,6 +29,7 @@ class _WebViewScreenState extends State<WebViewScreen> {
       leading: IconButton(onPressed: () async{
             if(await webViewController!.canGoBack()){
               webViewController!.goBack();
+                      urlController.text = "";
             }
       },
        icon: Icon(Icons.keyboard_backspace_rounded,
@@ -36,12 +43,15 @@ class _WebViewScreenState extends State<WebViewScreen> {
         borderRadius: BorderRadius.circular(12),
       ),
       child: TextField(
+        onSubmitted: (value) {
+         loadUrl(value);
+        },
         controller: urlController,
        autofocus: true,
        textAlign: TextAlign.center,
         decoration: InputDecoration(
         prefixIcon:Icon(Icons.search),
-        label: Text("Search"),
+       hintText: "Search",
         border: InputBorder.none ),
         
       ),
@@ -49,6 +59,7 @@ class _WebViewScreenState extends State<WebViewScreen> {
     actions: [
       IconButton(onPressed: (){
         webViewController!.reload();
+
       }, icon:Icon(Icons.refresh) ),
     ],
     ) ,
