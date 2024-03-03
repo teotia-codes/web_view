@@ -23,13 +23,23 @@ class _WebViewScreenState extends State<WebViewScreen> {
     }
   }
   @override
+  void initState() {
+    super.initState();
+     refreshController = PullToRefreshController(
+      onRefresh: () {
+        webViewController!.reload();
+      },
+  
+     );
+  }
+  @override
   Widget build(BuildContext context) {
    return Scaffold(
     appBar:AppBar(
       leading: IconButton(onPressed: () async{
             if(await webViewController!.canGoBack()){
               webViewController!.goBack();
-                      urlController.text = "";
+                     
             }
       },
        icon: Icon(Icons.keyboard_backspace_rounded,
@@ -66,6 +76,16 @@ class _WebViewScreenState extends State<WebViewScreen> {
     body: Column(
       children: [
         Expanded(child: InAppWebView(
+          onLoadStart: (controller, url) {
+            var v= url.toString();
+            setState(() {
+              urlController.text=v;
+            });
+          },
+          onLoadStop: (controller , url ){
+                  refreshController!.endRefreshing();
+          },
+          pullToRefreshController: refreshController,
           onWebViewCreated: (controller) => webViewController = controller,
           initialUrlRequest: URLRequest(url:WebUri(intialUrl)),
         ))
